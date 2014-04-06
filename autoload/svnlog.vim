@@ -21,41 +21,52 @@ endfunction
 
 function! s:InitWindow()
 	"create windows 
-	exec 'tabnew --Comments--'
-	let s:logwinnr = bufwinnr('--Comments--')
+	exe 'tabnew Comments'
+	exe 'silent keepalt botright split LogList'
+	exe 'silent keepalt botright split Modify'
 
-	exe 'silent keepalt botright split --LogList--'
-	let s:comwinnr = bufwinnr('--LogList--')
-
-	exe 'silent keepalt botright split --Modify--'
-	let s:modwinnr = bufwinnr('--Modify--')
+	"set window arrtrbute 
+	call s:InitCommentsWindow()
+	call s:InitLogWindow()
+	call s:InitModifyWindow()
 
 	"show data
 	call s:ShowLog()
 	call s:ShowComments(0)
 	call s:ShowModify(0)
 
-	call s:InitCommentsWindow()
-	call s:InitLogWindow()
-	call s:InitModifyWindow()
-
-	"move to logs window
+	"move focus to logs window
 	call s:GotoLogWindow()
+endfunction
 
+function! s:SetWindowAttribute()
+    setlocal noreadonly " in case the "view" mode is used
+    setlocal buftype=nofile
+    setlocal bufhidden=delete
+    setlocal noswapfile
+    setlocal nobuflisted
+    setlocal nolist
+    setlocal nowrap
+    setlocal winfixwidth
+    setlocal textwidth=0
+    setlocal nospell
 endfunction
 
 function! s:InitCommentsWindow()
 	call s:GotoCommentsWindow()
+	call s:SetWindowAttribute()
 	exe 'resize 4'
 endfunction
 
 function! s:InitLogWindow()
 	call s:GotoLogWindow()
+	call s:SetWindowAttribute()
 	autocmd CursorMoved <buffer> :call s:ShowCommentsAndModify()
 endfunction
 
 function! s:InitModifyWindow()
 	call s:GotoModifyWindow()
+	call s:SetWindowAttribute()
     nnoremap <buffer> <cr> :call ShowDiff()<cr>
 endfunction
 
@@ -73,7 +84,7 @@ function! ShowDiff()
 
 	"call svn diff
 	let diffcmd = '!svn diff ' .path .' -r ' .curVersion .':' .preVersion
-	echo 'diff cmd = ' .diffcmd
+	call g:VimDebug('diff cmd = ' .diffcmd)
 	exec diffcmd
 endfunction
 
