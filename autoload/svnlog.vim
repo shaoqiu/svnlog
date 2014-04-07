@@ -61,7 +61,10 @@ endfunction
 function! s:InitLogWindow()
 	call s:GotoLogWindow()
 	call s:SetWindowAttribute()
-	autocmd CursorMoved <buffer> :call s:ShowCommentsAndModify()
+	augroup ShowCommentsAndModify
+		autocmd!
+		autocmd CursorMoved <buffer> :call s:ShowCommentsAndModify()
+	augroup END
 endfunction
 
 function! s:InitModifyWindow()
