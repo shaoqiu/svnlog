@@ -20,9 +20,13 @@ edit /usr/local/bin/svndiff and input these line
 save the file and chmod a+x 
 and then modify ~/.subversion/config,
 change line 
+
 	# diff-cmd = diff_program (diff, gdiff, etc.)
+	
 to 
+
 	diff-cmd = /usr/local/bin/svndiff
+	
 
 add a line into your .vimrc:
 
@@ -37,7 +41,11 @@ useage
 cd to the svn dir 
 open vim
 type: 
+
 	:SVNLog [path]
+
+path is the dir or file which you want to show log,
+default is current dir.
 then it will create a new tab,it contains three window
 the top window is the commit comments,
 the middle window is the log list,
@@ -47,6 +55,5 @@ and type 'Enter', it will call svn diff to show the diff between current version
 
 note
 ==========
-
 
 
