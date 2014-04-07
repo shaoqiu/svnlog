@@ -70,10 +70,10 @@ endfunction
 function! s:InitModifyWindow()
 	call s:GotoModifyWindow()
 	call s:SetWindowAttribute()
-    nnoremap <buffer> <cr> :call ShowDiff()<cr>
+    nnoremap <buffer> <cr> :call <SID>ShowDiff()<cr>
 endfunction
 
-function! ShowDiff()
+function! s:ShowDiff()
 	"get current version and preversion
 	call s:GotoLogWindow()
 	let position = line('.')
