@@ -21,9 +21,9 @@ endfunction
 
 function! s:InitWindow()
 	"create windows 
-	exe 'tabnew Comments'
-	exe 'silent keepalt botright split LogList'
-	exe 'silent keepalt botright split Modify'
+	exe 'tabnew __Comments__'
+	exe 'silent keepalt botright split __LogList__'
+	exe 'silent keepalt botright split __Modify__'
 
 	"set window arrtrbute 
 	call s:InitCommentsWindow()
