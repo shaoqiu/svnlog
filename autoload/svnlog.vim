@@ -86,9 +86,17 @@ function! s:ShowDiff()
 	let path = strpart(line, 3, len(line))
 
 	"call svn diff
-	let diffcmd = '!svn diff ' .path .' -r ' .curVersion .':' .preVersion
+	let diffcmd = '!svn diff ' .s:GetRealPath(path) .' -r ' .curVersion .':' .preVersion
 	call g:VimDebug('diff cmd = ' .diffcmd)
 	exec diffcmd
+endfunction
+
+function! s:GetRealPath(path)
+	let svnRootPath = s:FindRoot()
+	call g:VimDebug('svn root path  = '.svnRootPath)
+	let svnRootParent = fnamemodify(svnRootPath, ':h')
+	call g:VimDebug('svn root path parent = '.svnRootParent)
+	return svnRootParent .'/' .a:path
 endfunction
 
 function! s:GetVersion(index)
@@ -222,3 +230,18 @@ function! s:GetLogs(svnCommand)
 	return logs
 endfunction
 
+function! s:FindRoot()
+	while 1
+		if getcwd() == '/'
+			return '/'
+		endif
+
+		let output  = system('ls -a')
+		let fileList = split(output)
+		if index(fileList, '.svn') >= 0
+			return getcwd()
+		endif
+
+		exec 'cd ..'
+	endwhile
+endfunction
