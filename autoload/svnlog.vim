@@ -83,7 +83,7 @@ function! s:ShowDiff()
 	"get modify path
 	call s:GotoModifyWindow()
 	let line = getline('.')
-	let path = strpart(line, 3, len(line))
+	let path = strpart(line, 2, len(line))
 
 	"call svn diff
 	let diffcmd = '!svn diff ' .s:GetRealPath(path) .' -r ' .curVersion .':' .preVersion
@@ -94,9 +94,7 @@ endfunction
 function! s:GetRealPath(path)
 	let svnRootPath = s:FindRoot()
 	call g:VimDebug('svn root path  = '.svnRootPath)
-	let svnRootParent = fnamemodify(svnRootPath, ':h')
-	call g:VimDebug('svn root path parent = '.svnRootParent)
-	return svnRootParent .'/' .a:path
+	return svnRootPath .a:path
 endfunction
 
 function! s:GetVersion(index)
@@ -231,17 +229,10 @@ function! s:GetLogs(svnCommand)
 endfunction
 
 function! s:FindRoot()
-	while 1
-		if getcwd() == '/'
-			return '/'
-		endif
-
-		let output  = system('ls -a')
-		let fileList = split(output)
-		if index(fileList, '.svn') >= 0
-			return getcwd()
-		endif
-
-		exec 'cd ..'
-	endwhile
+	let output = system('svn info')
+	let infoList = split(output, '\n')
+	let rootLine = get(infoList, 1)
+	let rootList = split(rootLine, ':')
+	let root = g:StringTrim(get(rootList, 1))
+	return root
 endfunction
