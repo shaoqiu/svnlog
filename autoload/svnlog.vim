@@ -94,7 +94,28 @@ endfunction
 function! s:GetRealPath(path)
 	let svnRootPath = s:FindRoot()
 	call g:VimDebug('svn root path  = '.svnRootPath)
-	return svnRootPath .a:path
+	let maxMatch = s:FindMaxMatch(svnRootPath, a:path)
+	if maxMatch == -1
+		return svnRootPath .a:path
+	endif
+	return svnRootPath .strpart(a:path, maxMatch, len(a:path)) 
+endfunction
+
+function! s:FindMaxMatch(svnRoot, modifyPath)
+	let maxMatch = -1
+	let col = 0
+	while  0 == 0
+		let col = stridx(a:modifyPath, '/', col + 1)
+		if col == -1
+			break
+		endif
+		let subStr = strpart(a:modifyPath, 0, col - 1)
+		let rcol = strridx(a:svnRoot, subStr)
+		if rcol != -1
+			let maxMatch = col
+		endif
+	endwhile
+	return maxMatch
 endfunction
 
 function! s:GetVersion(index)
