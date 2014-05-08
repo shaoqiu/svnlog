@@ -102,6 +102,10 @@ function! s:GetRealPath(path)
 endfunction
 
 function! s:FindMaxMatch(svnRoot, modifyPath)
+	if filereadable(a:svnRoot .a:modifyPath)
+		return -1
+	endif
+
 	let maxMatch = -1
 	let col = 0
 	while  0 == 0
