@@ -10,7 +10,7 @@ function! svnlog#log(path)
 	if !empty(a:path)
 		let svnCommand = 'svn log ' .a:path .' -v'
 	else
-		let svnCommand = 'svn log -v'
+		let svnCommand = 'svn log . -v'
 	endif
 
 	let s:logs = s:GetLogs(svnCommand)
