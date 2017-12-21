@@ -13,6 +13,7 @@ function! svnlog#log(path)
 		let svnCommand = 'svn log . -v'
 	endif
 
+    let svnCommand = svnCommand .' --limit 300'
 	let s:logs = s:GetLogs(svnCommand)
 
 	"Create ui to show the date
@@ -94,32 +95,8 @@ endfunction
 function! s:GetRealPath(path)
 	let svnRootPath = s:FindRoot()
 	call g:VimDebug('svn root path  = '.svnRootPath)
-	let maxMatch = s:FindMaxMatch(svnRootPath, a:path)
-	if maxMatch == -1
-		return svnRootPath .a:path
-	endif
-	return svnRootPath .strpart(a:path, maxMatch, len(a:path)) 
-endfunction
+    return svnRootPath .a:path
 
-function! s:FindMaxMatch(svnRoot, modifyPath)
-	if filereadable(a:svnRoot .a:modifyPath)
-		return -1
-	endif
-
-	let maxMatch = -1
-	let col = 0
-	while  0 == 0
-		let col = stridx(a:modifyPath, '/', col + 1)
-		if col == -1
-			break
-		endif
-		let subStr = strpart(a:modifyPath, 0, col - 1)
-		let rcol = strridx(a:svnRoot, subStr)
-		if rcol != -1
-			let maxMatch = col
-		endif
-	endwhile
-	return maxMatch
 endfunction
 
 function! s:GetVersion(index)
@@ -224,7 +201,8 @@ function! s:GetLogs(svnCommand)
 		endif
 
 		if status == 'base'
-			let log.base = line
+            let strend = stridx(line, "+0800", 0)
+			let log.base = strpart(line, 0, strend)
 			let status = 'changePrompt'
 			continue
 		endif
@@ -242,8 +220,10 @@ function! s:GetLogs(svnCommand)
 		if status == 'comments'
 			if log.comments == ''
 				let log.comments = line
+                let log.base = log.base . " | " .line
 			else
 				let log.comments = log.comments ."\n" .line
+                let log.base = log.base . " " .line
 			endif
 			continue
 		endif
@@ -256,8 +236,9 @@ endfunction
 function! s:FindRoot()
 	let output = system('svn info')
 	let infoList = split(output, '\n')
-	let rootLine = get(infoList, 1)
-	let rootList = split(rootLine, ':')
-	let root = g:StringTrim(get(rootList, 1))
+	let rootLine = get(infoList, 3)
+    let strstart = stridx(rootLine, "http", 0)
+	let root = strpart(rootLine, strstart, len(rootLine)) 
+	let root = g:StringTrim(root)
 	return root
 endfunction
