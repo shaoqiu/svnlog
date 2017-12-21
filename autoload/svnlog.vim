@@ -136,7 +136,11 @@ function! s:ShowComments(index)
 	exe '0,$ delete'
 	"set comments
 	let log = get(s:logs, a:index)
-	call setline(1, log.comments)
+	let i = 1
+	for comment in log.comments
+		call setline(i, comment)
+		let i = i+1
+	endfor
 endfunction
 
 function! s:ShowLog()
@@ -165,13 +169,13 @@ endfunction
 
 let s:LogInfo = {}
 let s:LogInfo.base = ''
-let s:LogInfo.comments = ''
+let s:LogInfo.comments = []
 let s:LogInfo.modify = []
 
 function! s:LogInfo()
 	let temp = {}
 	let temp.base = ''
-	let temp.comments = ''
+	let temp.comments = []
 	let temp.modify = []
 	return temp
 endfunction
@@ -218,11 +222,10 @@ function! s:GetLogs(svnCommand)
 		endif
 
 		if status == 'comments'
-			if log.comments == ''
-				let log.comments = line
+			call add(log.comments, line)
+			if len(log.comments) == 0
                 let log.base = log.base . " | " .line
 			else
-				let log.comments = log.comments ."\n" .line
                 let log.base = log.base . " " .line
 			endif
 			continue
@@ -236,9 +239,12 @@ endfunction
 function! s:FindRoot()
 	let output = system('svn info')
 	let infoList = split(output, '\n')
-	let rootLine = get(infoList, 3)
-    let strstart = stridx(rootLine, "http", 0)
-	let root = strpart(rootLine, strstart, len(rootLine)) 
-	let root = g:StringTrim(root)
-	return root
+    for line in infoList
+        if stridx(line, "Repository Root", 0) >=0
+            let strstart = stridx(line, "http", 0)
+            let root = strpart(line, strstart, len(line)) 
+            let root = g:StringTrim(root)
+            return root
+        endif
+    endfor
 endfunction
