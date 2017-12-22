@@ -87,7 +87,7 @@ function! s:ShowDiff()
 	let path = strpart(line, 2, len(line))
 
 	"call svn diff
-	let diffcmd = '!svn diff ' .s:GetRealPath(path) .' -r ' .curVersion .':' .preVersion
+	let diffcmd = '!svn diff "' .s:GetRealPath(path) .'" -r ' .curVersion .':' .preVersion
 	call g:VimDebug('diff cmd = ' .diffcmd)
 	exec diffcmd
 endfunction
@@ -240,7 +240,7 @@ function! s:FindRoot()
 	let output = system('svn info')
 	let infoList = split(output, '\n')
     for line in infoList
-        if stridx(line, "Repository Root", 0) >=0
+        if stridx(line, "Repository Root", 0) >=0 || stridx(line, "版本库根", 0) >=0
             let strstart = stridx(line, "http", 0)
             let root = strpart(line, strstart, len(line)) 
             let root = g:StringTrim(root)
