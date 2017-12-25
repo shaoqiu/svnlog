@@ -6,14 +6,12 @@ let g:loaded_svnlog = 1
 
 scriptencoding utf-8
 
-function! svnlog#log(path)
-	if !empty(a:path)
-		let svnCommand = 'svn log ' .a:path .' -v'
-	else
-		let svnCommand = 'svn log . -v'
+function! svnlog#log(limit)
+	if !empty(a:limit)
+		let svnCommand = 'svn log -v --limit ' .a:limit
+    else
+		let svnCommand = 'svn log -v --limit 200' 
 	endif
-
-    let svnCommand = svnCommand .' --limit 300'
 	let s:logs = s:GetLogs(svnCommand)
 
 	"Create ui to show the date
@@ -21,15 +19,18 @@ function! svnlog#log(path)
 endfunction
 
 function! s:InitWindow()
-	"create windows 
-	exe 'tabnew __Comments__'
-	exe 'silent keepalt botright split __LogList__'
-	exe 'silent keepalt botright split __Modify__'
+    if !exists("s:svnlog_init")
+        let s:svnlog_init = 1
+        "create windows 
+        exe 'tabnew __Comments__'
+        exe 'silent keepalt botright split __LogList__'
+        exe 'silent keepalt botright split __Modify__'
 
-	"set window arrtrbute 
-	call s:InitCommentsWindow()
-	call s:InitLogWindow()
-	call s:InitModifyWindow()
+        "set window arrtrbute 
+        call s:InitCommentsWindow()
+        call s:InitLogWindow()
+        call s:InitModifyWindow()
+    endif
 
 	"show data
 	call s:ShowLog()
@@ -87,7 +88,7 @@ function! s:ShowDiff()
 	let path = strpart(line, 2, len(line))
 
 	"call svn diff
-	let diffcmd = '!svn diff "' .s:GetRealPath(path) .'" -r ' .curVersion .':' .preVersion
+	let diffcmd = '!svn diff "' .s:GetRealPath(path) .'" -r ' .curVersion .':' .preVersion .'&'
 	call g:VimDebug('diff cmd = ' .diffcmd)
 	exec diffcmd
 endfunction
