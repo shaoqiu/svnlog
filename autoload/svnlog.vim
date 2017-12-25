@@ -181,6 +181,19 @@ function! s:LogInfo()
 	return temp
 endfunction
 
+function! s:FormatLog(msg)
+    let msgList = split(a:msg, "|")
+    let author = msgList[1]
+    let rest = 18 - len(author)
+    while rest > 0
+        let author = author ." "
+        let rest = rest - 1
+    endwhile
+
+    let msgList[1] = author
+    return join(msgList, " | ") 
+endfunction
+
 function! s:GetLogs(svnCommand)
 	let output = system(a:svnCommand)
 	let logs = []
@@ -208,6 +221,7 @@ function! s:GetLogs(svnCommand)
 		if status == 'base'
             let strend = stridx(line, "+0800", 0)
 			let log.base = strpart(line, 0, strend)
+            let log.base = s:FormatLog(log.base)
 			let status = 'changePrompt'
 			continue
 		endif
@@ -223,12 +237,13 @@ function! s:GetLogs(svnCommand)
 		endif
 
 		if status == 'comments'
-			call add(log.comments, line)
 			if len(log.comments) == 0
-                let log.base = log.base . " | " .line
+                let log.base = log.base . "  |  " .line
 			else
-                let log.base = log.base . " " .line
+                let log.base = log.base . "; " .line
 			endif
+
+			call add(log.comments, line)
 			continue
 		endif
 
