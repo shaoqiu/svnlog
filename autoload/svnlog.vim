@@ -88,7 +88,7 @@ function! s:ShowDiff()
 	let path = strpart(line, 2, len(line))
 
 	"call svn diff
-	let diffcmd = '!svn diff "' .s:GetRealPath(path) .'" -r ' .preVersion .':' .curVersion .'&'
+	let diffcmd = '!svn diff "' .s:GetRealPath(path) .'" -r ' .preVersion .':' .curVersion 
 	call g:VimDebug('diff cmd = ' .diffcmd)
 	exec diffcmd
 endfunction
